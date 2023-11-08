@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Running Pace Calculator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* För Chrome, Safari, Edge, Opera */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('dalle3.png'); /* Ange sökvägen till din bild här */
+            background-size: cover;  /* Täcker hela bakgrunden */
+            background-attachment: fixed;  /* Gör bakgrunden fast så den inte rullar med innehållet */
+            background-color: #f4f4f4;  /* Fallback färg om bilden inte laddas */
+            color: #ffffff;  /* Global font color set to dark gray */
+        }
+        
+        .banner {
+            background-color: rgba(51, 51, 51, 0.0);  /* 0.8 is the opacity */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;  /* Align items vertically */
+            padding: 10px;
+            font-style: italic;
+            font-family: Roboto;
+        }
+
+        .banner img {
+            width: 70px;  /* Adjust as needed */
+            height: 70px;  /* Adjust as needed */
+            margin-right: 20px;  /* Space between the logo and text */
+
+        }
+        /* Main content */
+        .main-content {
+            display: flex;
+            justify-content: space-evenly;
+            max-width: 95%;  /* Set a maximum width */
+            margin: auto;  /* Center the content */
+            flex-direction: column;
+    
+        }
+
+        /* Change the global focus outline color */
+        :focus {
+            outline: 2px solid rgba(0, 0, 0, 0.484);  /* Style, width, and color */
+        }
+
+
+        #reset-button {
+            width: 100px;
+            margin: 10px;
+            padding: 10px 20px;
+            border-radius: 30px;  /* Rounded corners */
+            box-shadow: 0 0 35px rgba(0,0,0,0.1);  /* Softer shadow */
+            background-color: rgba(0, 0, 0, 0.689);
+            color:white;
+            cursor: pointer;
+        }
+
+        #reset-button:hover {
+            background-color: rgba(0, 0, 0, 0.317);
+        }
+
+
+        /* Form Styles */
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        input[type="number"] {
+            width: 100px;
+            margin: 10px;
+            border-radius: 30px;  /* Rounded corners */
+            box-shadow: 0 0 35px rgba(0,0,0,0.1);  /* Softer shadow */
+            background-color: rgba(0, 0, 0, 0.689);
+            color:white;
+        }
+        input[type="submit"] {
+            width: 100px;
+            margin: 10px;
+            padding: 10px 20px;
+            border-radius: 30px;  /* Rounded corners */
+            box-shadow: 0 0 35px rgba(0,0,0,0.1);  /* Softer shadow */
+            background-color: rgba(0, 0, 0, 0.689);
+            color:white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color:rgba(0, 0, 0, 0.317);
+        }
+
+        /* Specific style for distance selector */
+        #distance_selector {
+            background-color: rgba(0, 0, 0, 0.689);
+            color: white;
+            border-radius: 10px;  /* Rounded corners */
+            box-shadow: 0 0 35px rgba(0,0,0,0.1);  /* Softer shadow */
+        }
+        .pace-form-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.598);
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.285);
+
+
+        }
+        .pace-form{
+            background-color: rgba(0, 0, 0, 0.285);
+            padding: 20px;
+            border-radius: 30px;
+            width: 35%;
+        }
+        /* Results Boxes */
+        .results-container {
+            display: flex;
+            justify-content: space-between;
+            width:80%;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 0 90px rgba(0, 0, 0, 1);
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.285);
+            
+        }
+        /* New styles for the results-wrapper */
+        .results-wrapper {
+            display: flex;
+            flex-direction: column;  /* Stack children vertically */
+            align-items: center;  /* Center children horizontally */
+            width: 50%; /* Makes sure it fits within the parent container */
+            word-wrap: break-word; /* Breaks the words in case they are too long */
+            margin-top: 100px;
+            background-color: rgba(0, 0, 0, 0.285);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            
+            
+        }
+
+        .result-box{
+            background-color: rgba(0, 0, 0, 0.285);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+        }
+        .history-box {
+            width: 80%;  /* Adjust as needed */
+            padding: 10px;
+            margin-top: 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 90px rgba(0, 0, 0, 1);
+            background-color: rgba(0, 0, 0, 0.285);
+            overflow-y: auto;  /* Enable vertical scrolling if content overflows */
+            max-height: 200px;  /* Set a max height */
+        }
+
+
+        /* Global style for all input boxes (number type) and select boxes */
+        input[type="number"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-size: 1em;
+        }
+
+        .text-box-container {
+            position: fixed; /* Fixes the position */
+            bottom: 0; /* Aligns it to the bottom */
+            left: 0; /* Aligns it to the left */
+            right: 0; /* Aligns it to the right */
+            width: 100%; /* Takes full width */
+            padding: 10px; /* Some padding */
+            border-top: 1px solid #ccc; /* A border at the top, optional */
+            background-color: rgba(0, 0, 0, 0.285); /* Background color */
+        }
+
+
+        #new-text-box {
+            width: 100%;
+            height: 200px;  /* Adjust the height as needed */
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-size: 1em;
+            background-color: rgba(0, 0, 0, 0.281);
+            color: white;
+            resize: none;  /* Disable resizing */
+            align-items: center;  /* Center children horizontally */
+        }
+        .equivalent-times-container{
+            width: 100%;  /* Takes full width */
+            padding: 10px;  /* Some padding */
+            border-top: 1px solid #ccc;  /* A border at the top, optional */
+            background-color: rgba(0, 0, 0, 0.285);  /* Background color */
+            flex-direction: column;
+
+            display: flex;
+            box-sizing: border-box;
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.598);
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.285);
+
+
+        }
+
+        
+
+        /* Style for history box */
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="banner">
+        <img src="logga.png" alt="Your Logo">  <!-- Add your logo here -->
+        <h1>Running Pace Calculator</h1>
+    </div>
+
+
+
+    <div class="main-content">
+        <div class="pace-form-container">
+            
+            <form id="pace-form" class="pace-form">
+                <label for="time_hours">Time hours:</label>
+                <input type="number" id="time_hours" name="time_hours" min="0"><br><br>
+                <label for="time_minutes">minutes:</label>
+                <input type="number" id="time_minutes" name="time_minutes" min="0"><br><br>
+                <label for="time_seconds">seconds:</label>
+                <input type="number" id="time_seconds" name="time_seconds" min="0"><br><br>
+
+                <label for="total_distance_km">Total Distance (km):</label>
+                <input type="number" id="total_distance_km" name="total_distance_km">
+                <select id="distance_selector">
+                    <option value="">Select predefined distance</option>
+                    <option value="Marathon">Marathon</option>
+                    <option value="Half Marathon">Half Marathon</option>
+                    <option value="100 miles">100 miles</option>
+                    <option value="50 miles">50 miles</option>
+                    <option value="2 miles">2 miles</option>
+                    <option value="1 mile">1 mile</option>
+                </select><br><br>
+
+                <input type="submit" value="Calculate">
+            </form>
+
+            <div class="results-wrapper">  <!-- New wrapper div -->
+                <h2>Results:</h2>
+                <div class="results-container">
+                    <div id="result-distance" class="result-box"></div>
+                    <div id="result-time" class="result-box"></div>
+                    <div id="result-pace" class="result-box"></div>
+                </div>
+                <div id="history-box" class="history-box"></div> <!-- Moved outside of results-container -->
+                <input type="button" id="reset-button" value="Reset">
+            </div>
+        </div>
+
+        <div class="equivalent-times-container">
+            <h2>Equivalent Times</h2>
+                <div id="equivalent-times"></div>
+            
+        </div>
+                
+            
+        <div class="text-box-container">
+            <textarea id="new-text-box" readonly>The calculator uses a Python script to round the pace needed to complete the distance to the nearest integer</textarea>
+        </div>
+    </div>
+
+<script>
+
+
+$(document).ready(function() {
+    $('#time_hours, #time_minutes, #time_seconds, #total_distance_km').on('input', function() {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+
+    $("#distance_selector").change(function() {
+        if ($(this).val()) {
+            $("#total_distance_km").val('');  // Clear the total distance field
+        }
+    });
+
+    $("#reset-button").click(function() {
+        // Clear input fields
+        $("#time_hours").val('');
+        $("#time_minutes").val('');
+        $("#time_seconds").val('');
+        $("#total_distance_km").val('');
+        $("#distance_selector").val('');
+
+        // Clear result boxes
+        $("#result-distance").text('');
+        $("#result-time").text('');
+        $("#result-pace").text('');
+
+        // Optionally, clear the history box
+        $("#history-box").html('');
+    });
+
+
+    let lastHistoryEntry = "";  // Variable to hold the last calculation result
+
+    $("#pace-form").submit(function(event) {
+        event.preventDefault();
+
+        let time_hours = $("#time_hours").val() !== "" ? $("#time_hours").val() : 0;
+        let time_minutes = $("#time_minutes").val() !== "" ? $("#time_minutes").val() : 0;
+        let time_seconds = $("#time_seconds").val() !== "" ? $("#time_seconds").val() : 0;
+        let total_distance_km = $("#total_distance_km").val() || $("#distance_selector").val();
+
+        $.ajax({
+            url: "http://127.0.0.1:5000/calculate_pace",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ time_hours, time_minutes, time_seconds, total_distance_km }),
+            success: function(response) {
+                if (response.error) {
+                    $("#result-distance, #result-time, #result-pace").text(""); // Clear previous results
+                    $("#result").text("Error: " + response.error);
+                } else {
+                    $("#result-distance").text(`Distance: ${response.distance_name}`);
+                    $("#result-time").text(`Time: ${response.formatted_time}`);
+                    $("#result-pace").text(`Pace: ${response.formatted_pace} per kilometer`);
+
+                    // Append the last calculation to history before saving the new result
+                    if (lastHistoryEntry !== "") {
+                        $("#history-box").append(lastHistoryEntry);
+                    }
+
+                    // Save the new calculation to lastHistoryEntry
+                    lastHistoryEntry = `<div>Distance: ${response.distance_name}, Time: ${response.formatted_time}, Pace: ${response.formatted_pace} per kilometer</div>`;
+
+                    // New AJAX call to get equivalent times
+                    $.ajax({
+                        url: "http://127.0.0.1:5000/equivalent_times",
+                        method: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ time_minutes: parseFloat(time_hours) * 60 + parseFloat(time_minutes) + parseFloat(time_seconds) / 60, distance_km: total_distance_km }),
+                        success: function(eqResponse) {
+                            // Clear previous equivalent times
+                            $("#equivalent-times").html("");
+                            
+                            // Populate the equivalent times
+                            eqResponse.forEach(function(item) {
+                                $("#equivalent-times").append(`<div>${item[0]}: ${item[1]}</div>`);
+                            });
+                        },
+                        error: function() {
+                            $("#equivalent-times").text("An error occurred while calculating the equivalent times.");
+                        }
+                    });
+                }
+            },
+            error: function() {
+                $("#result").text("An error occurred while calculating the pace.");
+            }
+        });
+    });
+
+
+
+
+});
+</script>
+
+</body>
+</html>
